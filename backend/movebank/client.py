@@ -17,7 +17,7 @@ MOVEBANK_PASSWORD = os.getenv("MOVEBANK_PASSWORD")
 
 
 # TODO Explore direct JSON requests (doesn't appear to be fully supported?)
-def callMovebankAPI(params):
+def call_movebank_api(params):
     # Requests Movebank API with ((param1, value1), (param2, value2),).
     # Returns the API response as plain text.
 
@@ -42,8 +42,8 @@ def callMovebankAPI(params):
     return ''
 
 
-def getStudies():
-    studies = callMovebankAPI((
+def get_studies():
+    studies = call_movebank_api((
         ('entity_type', 'study'), ('i_can_see_data', 'true'), 
         ('there_are_data_which_i_cannot_see', 'false'), 
     ))
@@ -53,8 +53,8 @@ def getStudies():
         return studies
     return []
 
-def getStudy(study_id):
-    study = callMovebankAPI((('entity_type', 'study'), ('study_id', study_id)))
+def get_study(study_id):
+    study = call_movebank_api((('entity_type', 'study'), ('study_id', study_id)))
     result = csv_to_dict(study)
 
     if result:
@@ -62,8 +62,8 @@ def getStudy(study_id):
     return []
 
 
-def getIndividualsByStudy(study_id):
-    individuals = callMovebankAPI((('entity_type', 'individual'), ('study_id', study_id)))
+def get_individuals_by_study(study_id):
+    individuals = call_movebank_api((('entity_type', 'individual'), ('study_id', study_id)))
     result = csv_to_dict(individuals)
     print(result)
     # if len(individuals) > 0:
@@ -71,12 +71,12 @@ def getIndividualsByStudy(study_id):
     # return []
 
 
-def getIndividualEvents(study_id, individual_id, sensor_type_id):
+def get_individual_events(study_id, individual_id, sensor_type_id):
     # See below table for sensor_type_id's.
 
     params = (('entity_type', 'event'), ('study_id', study_id), ('individual_id', individual_id),
               ('sensor_type_ids', sensor_type_id), ('attributes', 'all'))
-    events = callMovebankAPI(params)
+    events = call_movebank_api(params)
     if len(events) > 0:
         return csv_to_dict(events)
     return []
@@ -96,7 +96,7 @@ def csv_to_dict(raw_csv: str) -> Dict[str, str]:
 
 
 # Debugging
-def prettyPrint(data):
+def pretty_print(data):
     print(json.dumps(data, indent=2))
 
 """"
