@@ -16,11 +16,6 @@ MOVEBANK_USERNAME = os.getenv("MOVEBANK_USERNAME")
 MOVEBANK_PASSWORD = os.getenv("MOVEBANK_PASSWORD")
 
 
-import requests
-import hashlib
-import json
-
-
 # TODO Explore direct JSON requests (doesn't appear to be fully supported?)
 def callMovebankAPI(params):
     # Requests Movebank API with ((param1, value1), (param2, value2),).
@@ -67,10 +62,6 @@ def getStudy(study_id):
     return []
 
 
-def getStudiesBySensor(studies, sensorname='GPS'):
-    return [s for s in studies if sensorname in s['sensor_type_ids']]
-
-
 def getIndividualsByStudy(study_id):
     individuals = callMovebankAPI((('entity_type', 'individual'), ('study_id', study_id)))
     result = csv_to_dict(individuals)
@@ -89,22 +80,6 @@ def getIndividualEvents(study_id, individual_id, sensor_type_id):
     if len(events) > 0:
         return csv_to_dict(events)
     return []
-
-
-def transformRawGPS(gpsevents):
-    # Returns a list of (ts, deployment_id, lat, long) tuples
-
-    def transform(e):  # dimension reduction and data type conversion
-        try:
-            if len(e['location_lat']) > 0:
-                e['location_lat'] = float(e['location_lat'])
-            if len(e['location_long']) > 0:
-                e['location_long'] = float(e['location_long'])
-        except:
-            print("Could not parse long/lat.")
-        return e['timestamp'], e['deployment_id'], e['location_lat'], e['location_long']
-
-    return [transform(e) for e in gpsevents]
 
 
 def csv_to_dict(raw_csv: str) -> Dict[str, str]:

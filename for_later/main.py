@@ -5,9 +5,6 @@ import sqlalchemy.orm as _orm
 import for_later.schemas as _schemas
 import for_later.services as _services
 
-### TO DO
-# Rework so that we have a CRUD API with proxy endpoints
-
 if TYPE_CHECKING:
     from sqlalchemy.orm import Session
 
