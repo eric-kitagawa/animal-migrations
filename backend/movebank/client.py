@@ -6,6 +6,7 @@ import json
 import io
 from dotenv import load_dotenv
 from typing import Dict
+from movebank.schemas import Study, Individual, Event
 
 # Load environment variables
 load_dotenv()
@@ -56,29 +57,31 @@ def get_studies():
 def get_study(study_id):
     study = call_movebank_api((('entity_type', 'study'), ('study_id', study_id)))
     result = csv_to_dict(study)
-
     if result:
-        return result
+        valid_study = [Study(**study) for study in result]
+        return valid_study
     return []
 
 
 def get_individuals_by_study(study_id):
     individuals = call_movebank_api((('entity_type', 'individual'), ('study_id', study_id)))
-    result = csv_to_dict(individuals)
-    print(result)
-    # if len(individuals) > 0:
-    #     return list(csv.DictReader(io.StringIO(individuals)))
-    # return []
+    individuals = csv_to_dict(individuals)
+    result = [{**individual, "study_id": study_id} for individual in individuals]
+    if result:
+        valid_individuals = [Individual(**ind) for ind in result]
+        return valid_individuals
+    return []
 
 
 def get_individual_events(study_id, individual_id, sensor_type_id):
     # See below table for sensor_type_id's.
-
     params = (('entity_type', 'event'), ('study_id', study_id), ('individual_id', individual_id),
               ('sensor_type_ids', sensor_type_id), ('attributes', 'all'))
     events = call_movebank_api(params)
-    if len(events) > 0:
-        return csv_to_dict(events)
+    result = csv_to_dict(events)
+    if len(result) > 0:
+        result = [Event(**event) for event in result]
+        return result
     return []
 
 
